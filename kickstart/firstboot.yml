@@ -13,6 +13,6 @@
           mode: u=rw,g=r,o=r
           
       - name: Remove firstboot cron job
-          cron:
-              name: "firstboot"
-              state: absent
+        cron:
+          name: "firstboot"
+          state: absent
