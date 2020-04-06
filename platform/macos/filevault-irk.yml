@@ -1,0 +1,56 @@
+---
+# DESCRIPTION
+# Copies and sets FileVault Institutional Recovery Key (IRK) on macOS machines
+- hosts: all
+  name: FileVault IRK Install
+  gather_facts: no
+  become: yes
+  tasks:
+  vars:
+    irk_src_location: /some/remote/folder/FileVaultMaster.keychain
+    
+- name: Checking if FileVault is enabled
+  shell: fdesetup status
+  register: fv_status.stdout
+
+- name: Set IRK on Macs that have FileVault enabled
+  block:
+    # End the play on machines that already have an IRK set
+    # Remove or comment to overwrite existing IRK
+    - name: Checking if Institutional Recovery Key is set
+      shell: fdesetup hasinstitutionalrecoverykey
+      register: has_irk.stdout
+    - meta: end_host
+      when: has_irk.stdout == 'true'
+
+    - name: Copying the FileVault Master Keychain
+      copy: 
+        src: {{ irk_src_location }}
+        dest: /Library/Keychains/FileVaultMaster.keychain
+        force: yes
+        owner: root
+        group: wheel
+        mode: '0644' # or preserve
+
+    - name: Set new IRK as recovery method
+      shell: 
+        cmd: fdesetup changerecovery -institutional -keychain /Library/Keychains/FileVaultMaster.keychain
+  when: fv_status.stdout == 'FileVault is On.'
+
+- name: Enable FileVault and set IRK on Macs that did not have FileVault enabled
+  block:
+    #Copy the keychain
+    - name: Copying the FileVault Master Keychain
+      copy:
+        src: {{ irk_src_location }}
+        dest: /Library/Keychains/FileVaultMaster.keychain
+        force: yes
+        owner: root
+        group: wheel
+        mode: '0644' # or preserve
+    # Enable FileVault
+    # The copied keychain will be set using the -keychain flag
+    - name: enable FileVault
+      shell:
+        cmd: fdesetup enable -keychain -defer -forceatlogin 0 -norecoverykey 
+  when: fv_status.stdout == 'FileVault is Off.'
