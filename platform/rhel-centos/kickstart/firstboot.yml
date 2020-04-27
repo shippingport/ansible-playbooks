@@ -1,0 +1,13 @@
+---
+# DESCRIPTION
+# Creates a temporary file in /tmp for testing purposes
+- hosts: all
+  name: Temporary file creation
+  gather_facts: no
+  tasks:
+   - block:
+      - name: Touch a temporary file
+        file:
+          path: /tmp/ansible-success
+          state: touch
+          mode: u=rw,g=r,o=r
