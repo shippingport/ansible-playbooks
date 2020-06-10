@@ -17,11 +17,11 @@ The files should be fairly self-explanatory:
 ###### ks.cfg
 The actual Kickstart file. Customize the installation options as needed. Make sure to copy in the private key used for accessing your Git repo.
 ###### firstboot.sh
-This script is embedded in the Kickstart file and is called on first boot using cron. It adds SSH keys for Github, then installs `git` and `ansible`. It then runs `ansible-pull` to provision the server.
+This script is embedded in the Kickstart file and is called on first boot using a runonce service. It adds SSH keys for Github, then installs `git` and `ansible`. It then runs `ansible-pull` to provision the server.
 Make sure to copy changes to this file back to `ks.cfg`, or edit `%post%` to copy the file from somewhere else, e.g.:
 ```
 %post --nochroot
-cp -a /run/install/repo/custom/firstboot.sh /root/firstboot.sh
+cp -a /run/install/repo/custom/firstboot.sh /mnt/sysimage/root/firstboot.sh
 %end
 ```
 ###### firstboot.yml
