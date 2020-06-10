@@ -1,6 +1,6 @@
 # Kickstart for Ansible provisioning
 
-A Red Hat Kickstart file for automatic installation and provisioning through Ansible for RHEL and CentOS (and Fedora with modifications).
+A Red Hat Kickstart file for automatic installation and provisioning through Ansible for RHEL and CentOS (and Fedora with a few modifications).
 
 ### Usage
 
